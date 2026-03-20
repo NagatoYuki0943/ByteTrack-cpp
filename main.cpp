@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
         float width = std::stof(results_j["width"].get<std::string>());
         float height = std::stof(results_j["height"].get<std::string>());
 
+        // tlwh(ltwh) format: Top-Left Width-Height
         byte_track::Object object = {byte_track::Rect(x, y, width, height), 0, prob};
         detection_results[frame_id].push_back(object);
     }
@@ -102,6 +103,7 @@ int main(int argc, char *argv[])
         float width = std::stof(results_j["width"].get<std::string>());
         float height = std::stof(results_j["height"].get<std::string>());
 
+        // tlwh(ltwh) format: Top-Left Width-Height
         byte_track::Rect<float> rect = byte_track::Rect<float>(x, y, width, height);
         tracking_results[frame_id][track_id] = rect;
     }
