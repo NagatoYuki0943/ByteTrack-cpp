@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <filesystem>
+#include <chrono>
 #include <cassert>
 #include <nlohmann/json.hpp>
 #include "src/ByteTrack/BYTETracker.h"
@@ -115,10 +116,15 @@ int test_byte_track()
     byte_track::BYTETracker tracker(detection_fps, detection_track_buffer);
 
     // 逐帧跟踪
+    int time_total = 0;
     for (const auto &[frame_id, frame_objects] : detection_results)
     {
         auto &ref_track_outputs = tracking_results[frame_id];
+
+        int t1 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         const auto track_outputs = tracker.update(frame_objects);
+        int t2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        time_total += t2 - t1;
 
         std::cout << "frame_id: " << frame_id << std::endl;
 
@@ -144,6 +150,9 @@ int test_byte_track()
         }
         std::cout << std::endl;
     }
+
+    float avg_time = static_cast<float>(time_total) / tracking_results.size();
+    std::cout << "avg_time: " << avg_time << std::endl;
 
     return 0;
 }
