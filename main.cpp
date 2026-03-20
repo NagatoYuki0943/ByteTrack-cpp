@@ -71,7 +71,7 @@ int test_byte_track()
     auto detection_j = read_json(detection_result_file);
     int detection_fps = detection_j["fps"].get<int>();
     int detection_track_buffer = detection_j["track_buffer"].get<int>();
-    std::map<int, std::vector<byte_track::Object>> detection_results;
+    std::map<size_t, std::vector<byte_track::Object>> detection_results;
     for(const auto &results_j : detection_j["results"]){
         int frame_id = std::stoi(results_j["frame_id"].get<std::string>());
         float prob = std::stof(results_j["prob"].get<std::string>());
@@ -93,7 +93,7 @@ int test_byte_track()
     auto tracking_j = read_json(tracking_result_file);
     int tracking_fps = tracking_j["fps"].get<int>();
     int tracking_track_buffer = tracking_j["track_buffer"].get<int>();
-    std::map<int, std::map<int, byte_track::Rect<float>>> tracking_results;
+    std::map<size_t, std::map<size_t, byte_track::Rect<float>>> tracking_results;
     for(const auto &results_j : tracking_j["results"]){
         int frame_id = std::stoi(results_j["frame_id"].get<std::string>());
         int track_id = std::stoi(results_j["track_id"].get<std::string>());
@@ -115,23 +115,26 @@ int test_byte_track()
     byte_track::BYTETracker tracker(detection_fps, detection_track_buffer);
 
     // 逐帧跟踪
-    for (const auto &[frame_id, objects] : detection_results)
+    for (const auto &[frame_id, frame_objects] : detection_results)
     {
-        auto &ref_objects = tracking_results[frame_id];
-        const auto outputs = tracker.update(objects);
+        auto &ref_track_outputs = tracking_results[frame_id];
+        const auto track_outputs = tracker.update(frame_objects);
 
         std::cout << "frame_id: " << frame_id << std::endl;
 
-        int predict_num = outputs.size();
-        int ref_num = ref_objects.size();
-        EXPECT_EQ(predict_num, ref_num);
-        std::cout << "predict_num: " << predict_num << ", ref_num: " << ref_num << std::endl;
+        size_t track_num = track_outputs.size();
+        size_t ref_track_num = ref_track_outputs.size();
+        EXPECT_EQ(track_num, ref_track_num);
+        std::cout << "track_num: " << track_num << ", ref_track_num: " << ref_track_num << std::endl;
 
-        for (const auto &outputs_per_frame : outputs)
+        // 遍历每个 track 的 object
+        for (const auto &track_output : track_outputs)
         {
-            const auto &rect = outputs_per_frame->getRect();
-            const auto &track_id = outputs_per_frame->getTrackId();
-            const auto &ref = ref_objects[track_id];
+            const auto &track_id = track_output->getTrackId();
+            const auto &rect = track_output->getRect();
+
+            const auto &ref = ref_track_outputs[track_id];
+
             EXPECT_NEAR(ref.x(), rect.x());
             EXPECT_NEAR(ref.y(), rect.y());
             EXPECT_NEAR(ref.width(), rect.width());
