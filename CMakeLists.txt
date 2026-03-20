@@ -1,71 +1,42 @@
-cmake_minimum_required(VERSION 3.14)
-project(bytetrack)
+cmake_minimum_required (VERSION 3.10)
+project("bytetrack")
 
-IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE Release)
-ENDIF()
+set(CMAKE_CXX_STANDARD 20)
+# 设置为 ON 表示指定的 C++ 标准是必需的
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# 设置为 OFF 表示禁用编译器特定的语言扩展
+# 具体来说：
+#   当设置为 OFF 时，编译器会使用纯标准的 C++ 标志，例如 -std=c++17
+#   当设置为 ON（默认值）时，编译器会使用带扩展的标志，例如 -std=gnu++17
+# 禁用扩展可以确保你的代码具有更好的可移植性，能够在不同的编译器之间兼容
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g -MMD -Wall -Wextra -Winit-self")
-
-# Check C++17 support
-include(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
-if(COMPILER_SUPPORTS_CXX17)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-  add_definitions(-DCOMPILEDWITHC17)
-  message(STATUS "Using flag -std=c++17.")
-else()
-  message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
+# 如果支持，请为 MSVC 编译器启用热重载。
+if (POLICY CMP0141)
+    cmake_policy(SET CMP0141 NEW)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
-set(EIGEN_VERSION 3.3)
-find_package(Eigen3 ${EIGEN_VERSION} QUIET)
-if(NOT EIGEN3_FOUND)
-  set(BUILD_TESTING OFF CACHE INTERNAL "")
-  FetchContent_Declare(eigen
-    GIT_REPOSITORY  https://gitlab.com/libeigen/eigen.git
-    GIT_TAG         ${EIGEN_VERSION}
-    GIT_SHALLOW     ON)
-  FetchContent_MakeAvailable(eigen)
-  unset(BUILD_TESTING CACHE)
-endif()
+find_package(Eigen3 REQUIRED)
 
-add_library(${PROJECT_NAME} SHARED
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/BYTETracker.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/KalmanFilter.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/lapjv.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Object.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Rect.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/STrack.cpp
-  )
-target_include_directories(${PROJECT_NAME} PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  )
-target_link_libraries(${PROJECT_NAME} Eigen3::Eigen)
+# 将源代码添加到此项目的可执行文件。
+set(SOURCES
+    main
+    "main.cpp"
+    "src/ByteTrack/BYTETracker.cpp"
+    "src/ByteTrack/KalmanFilter.cpp"
+    "src/ByteTrack/lapjv.cpp"
+    "src/ByteTrack/Object.cpp"
+    "src/ByteTrack/Rect.cpp"
+    "src/ByteTrack/STrack.cpp"
+)
 
-# Build the tests if the 'BUILD_BYTETRACK_TEST' variable is set to 'ON'
-set(BUILD_BYTETRACK_TEST OFF CACHE BOOL "The flag whether to build the tests or not")
-if(BUILD_BYTETRACK_TEST)
-  enable_testing()
+# 添加可执行文件
+add_executable(main ${SOURCES})
 
-  find_package(GTest QUIET)
-  if(NOT GTest_FOUND)
-    message(FATAL_ERROR "GTest not found.")
-  endif()
+target_include_directories(main PRIVATE
+    include
+    src/ByteTrack
+)
 
-  add_executable(${PROJECT_NAME}_test
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/test_BYTETracker.cpp
-  )
-
-  target_link_libraries(${PROJECT_NAME}_test
-    ${PROJECT_NAME}
-    GTest::GTest
-    GTest::Main
-    )
-
-  gtest_discover_tests(${PROJECT_NAME}_test
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/YOLOX_ncnn_palace)
-endif()
+target_link_libraries(main Eigen3::Eigen)

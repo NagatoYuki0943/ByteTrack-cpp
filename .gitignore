@@ -1,4 +1,7 @@
+include/*
+!include/.gitkeep
 build/*
+out/*
 
 # Prerequisites
 *.d
