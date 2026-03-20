@@ -50,10 +50,9 @@ void EXPECT_NEAR(const float a, const float b)
     assert((std::abs(a - b) < EPS) && "not near");
 }
 
-int main(int argc, char *argv[])
+
+int test_byte_track()
 {
-    std::cout << "argc: " << argc << std::endl;
-    std::cout << "program name: " << argv[0] << std::endl;
 
     const std::string detection_result_file = "../../../data/YOLOX_ncnn_palace/detection_results.json";
     const std::string tracking_result_file = "../../../data/YOLOX_ncnn_palace/tracking_results.json";
@@ -142,6 +141,18 @@ int main(int argc, char *argv[])
         }
         std::cout << std::endl;
     }
+
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    std::cout << "argc: " << argc << std::endl;
+    std::cout << "program name: " << argv[0] << std::endl;
+
+    int res = test_byte_track();
+    if (res != 0)
+        return -1;
 
     return 0;
 }
