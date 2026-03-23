@@ -1,3 +1,5 @@
+#ifndef KALMAN_FILTER_H
+#define KALMAN_FILTER_H
 #pragma once
 
 #include <Eigen/Dense>
@@ -6,34 +8,36 @@
 
 namespace byte_track
 {
-class KalmanFilter
-{
-public:
-    using DetectBox = Xyah<float>;
+    class KalmanFilter
+    {
+    public:
+        using DetectBox = Xyah<float>;
 
-    using StateMean = Eigen::Matrix<float, 1, 8, Eigen::RowMajor>;
-    using StateCov = Eigen::Matrix<float, 8, 8, Eigen::RowMajor>;
+        using StateMean = Eigen::Matrix<float, 1, 8, Eigen::RowMajor>;
+        using StateCov = Eigen::Matrix<float, 8, 8, Eigen::RowMajor>;
 
-    using StateHMean = Eigen::Matrix<float, 1, 4, Eigen::RowMajor>;
-    using StateHCov = Eigen::Matrix<float, 4, 4, Eigen::RowMajor>;
+        using StateHMean = Eigen::Matrix<float, 1, 4, Eigen::RowMajor>;
+        using StateHCov = Eigen::Matrix<float, 4, 4, Eigen::RowMajor>;
 
-    KalmanFilter(const float& std_weight_position = 1. / 20,
-                 const float& std_weight_velocity = 1. / 160);
+        KalmanFilter(const float &std_weight_position = 1. / 20,
+                     const float &std_weight_velocity = 1. / 160);
 
-    void initiate(StateMean& mean, StateCov& covariance, const DetectBox& measurement);
+        void initiate(StateMean &mean, StateCov &covariance, const DetectBox &measurement);
 
-    void predict(StateMean& mean, StateCov& covariance);
+        void predict(StateMean &mean, StateCov &covariance);
 
-    void update(StateMean& mean, StateCov& covariance, const DetectBox& measurement);
+        void update(StateMean &mean, StateCov &covariance, const DetectBox &measurement);
 
-private:
-    float std_weight_position_;
-    float std_weight_velocity_;
+    private:
+        float std_weight_position_;
+        float std_weight_velocity_;
 
-    Eigen::Matrix<float, 8, 8, Eigen::RowMajor> motion_mat_;
-    Eigen::Matrix<float, 4, 8, Eigen::RowMajor> update_mat_;
+        Eigen::Matrix<float, 8, 8, Eigen::RowMajor> motion_mat_;
+        Eigen::Matrix<float, 4, 8, Eigen::RowMajor> update_mat_;
 
-    void project(StateHMean &projected_mean, StateHCov &projected_covariance,
-                 const StateMean& mean, const StateCov& covariance);
-};
+        void project(StateHMean &projected_mean, StateHCov &projected_covariance,
+                     const StateMean &mean, const StateCov &covariance);
+    };
 }
+
+#endif // KALMAN_FILTER_H

@@ -2,18 +2,17 @@
 
 #include <cstddef>
 
-byte_track::STrack::STrack(const Rect<float>& rect, const float& score) :
-    kalman_filter_(),
-    mean_(),
-    covariance_(),
-    rect_(rect),
-    state_(STrackState::New),
-    is_activated_(false),
-    score_(score),
-    track_id_(0),
-    frame_id_(0),
-    start_frame_id_(0),
-    tracklet_len_(0)
+byte_track::STrack::STrack(const Rect<float> &rect, const float &score) : kalman_filter_(),
+                                                                          mean_(),
+                                                                          covariance_(),
+                                                                          rect_(rect),
+                                                                          state_(STrackState::New),
+                                                                          is_activated_(false),
+                                                                          score_(score),
+                                                                          track_id_(0),
+                                                                          frame_id_(0),
+                                                                          start_frame_id_(0),
+                                                                          tracklet_len_(0)
 {
 }
 
@@ -21,46 +20,46 @@ byte_track::STrack::~STrack()
 {
 }
 
-const byte_track::Rect<float>& byte_track::STrack::getRect() const
+const byte_track::Rect<float> &byte_track::STrack::getRect() const
 {
     return rect_;
 }
 
-const byte_track::STrackState& byte_track::STrack::getSTrackState() const
+const byte_track::STrackState &byte_track::STrack::getSTrackState() const
 {
     return state_;
 }
 
-const bool& byte_track::STrack::isActivated() const
+const bool &byte_track::STrack::isActivated() const
 {
     return is_activated_;
 }
-const float& byte_track::STrack::getScore() const
+const float &byte_track::STrack::getScore() const
 {
     return score_;
 }
 
-const size_t& byte_track::STrack::getTrackId() const
+const size_t &byte_track::STrack::getTrackId() const
 {
     return track_id_;
 }
 
-const size_t& byte_track::STrack::getFrameId() const
+const size_t &byte_track::STrack::getFrameId() const
 {
     return frame_id_;
 }
 
-const size_t& byte_track::STrack::getStartFrameId() const
+const size_t &byte_track::STrack::getStartFrameId() const
 {
     return start_frame_id_;
 }
 
-const size_t& byte_track::STrack::getTrackletLength() const
+const size_t &byte_track::STrack::getTrackletLength() const
 {
     return tracklet_len_;
 }
 
-void byte_track::STrack::activate(const size_t& frame_id, const size_t& track_id)
+void byte_track::STrack::activate(const size_t &frame_id, const size_t &track_id)
 {
     kalman_filter_.initiate(mean_, covariance_, rect_.getXyah());
 

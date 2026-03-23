@@ -2,10 +2,9 @@
 
 #include <cstddef>
 
-byte_track::KalmanFilter::KalmanFilter(const float& std_weight_position,
-                                       const float& std_weight_velocity) :
-    std_weight_position_(std_weight_position),
-    std_weight_velocity_(std_weight_velocity)
+byte_track::KalmanFilter::KalmanFilter(const float &std_weight_position,
+                                       const float &std_weight_velocity) : std_weight_position_(std_weight_position),
+                                                                           std_weight_velocity_(std_weight_velocity)
 {
     constexpr size_t ndim = 4;
     constexpr float dt = 1;
@@ -73,13 +72,13 @@ void byte_track::KalmanFilter::update(StateMean &mean, StateCov &covariance, con
 }
 
 void byte_track::KalmanFilter::project(StateHMean &projected_mean, StateHCov &projected_covariance,
-                                       const StateMean& mean, const StateCov& covariance)
+                                       const StateMean &mean, const StateCov &covariance)
 {
     DetectBox std;
     std << std_weight_position_ * mean(3),
-           std_weight_position_ * mean(3),
-           1e-1,
-           std_weight_position_ * mean(3);
+        std_weight_position_ * mean(3),
+        1e-1,
+        std_weight_position_ * mean(3);
 
     projected_mean = update_mat_ * mean.transpose();
     projected_covariance = update_mat_ * covariance * (update_mat_.transpose());
