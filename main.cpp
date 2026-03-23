@@ -117,7 +117,8 @@ int test_byte_track()
         // 遍历每个 track 的 object
         for (const auto &track_output : track_outputs)
         {
-            const auto &track_id = track_output->getTrackId();
+            const auto track_id = track_output->getTrackId();
+            const auto score = track_output->getScore();
             const auto &rect = track_output->getRect();
 
             const auto &ref = ref_track_outputs[track_id];
