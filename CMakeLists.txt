@@ -34,9 +34,6 @@ set(SOURCES
 # 添加可执行文件
 add_executable(main ${SOURCES})
 
-target_include_directories(main PRIVATE
-    include
-    src/ByteTrack
-)
+target_include_directories(main PRIVATE include)
 
 target_link_libraries(main Eigen3::Eigen)
