@@ -18,6 +18,11 @@ if (POLICY CMP0141)
 endif()
 
 find_package(Eigen3 REQUIRED)
+if(Eigen3_FOUND)
+    # 获取目标接口的包含目录
+    get_target_property(Eigen3_INCLUDE_DIR Eigen3::Eigen INTERFACE_INCLUDE_DIRECTORIES)
+    message("Eigen3 Target Include Dirs: ${Eigen3_INCLUDE_DIR}")
+endif()
 
 # 将源代码添加到此项目的可执行文件。
 set(SOURCES
