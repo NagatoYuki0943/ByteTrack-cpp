@@ -10,26 +10,6 @@
 
 namespace fs = std::filesystem;
 
-struct DetectionResult
-{
-    int frame_id;
-    float prob;
-    float x;
-    float y;
-    float width;
-    float height;
-};
-
-struct TrackingResult
-{
-    int frame_id;
-    int track_id;
-    float x;
-    float y;
-    float width;
-    float height;
-};
-
 nlohmann::json read_json(const std::string &json_file)
 {
     nlohmann::json j;
@@ -51,13 +31,12 @@ void EXPECT_NEAR(const float a, const float b)
     assert((std::abs(a - b) < EPS) && "not near");
 }
 
-
 int test_byte_track()
 {
 
     const std::string detection_result_file = "../../../data/YOLOX_ncnn_palace/detection_results.json";
     const std::string tracking_result_file = "../../../data/YOLOX_ncnn_palace/tracking_results.json";
-    if(!fs::exists(detection_result_file))
+    if (!fs::exists(detection_result_file))
     {
         std::cout << "detection results file: " << detection_result_file << " not found" << std::endl;
         return -1;
@@ -73,7 +52,8 @@ int test_byte_track()
     int detection_fps = detection_j["fps"].get<int>();
     int detection_track_buffer = detection_j["track_buffer"].get<int>();
     std::map<size_t, std::vector<byte_track::Object>> detection_results;
-    for(const auto &results_j : detection_j["results"]){
+    for (const auto &results_j : detection_j["results"])
+    {
         int frame_id = std::stoi(results_j["frame_id"].get<std::string>());
         float prob = std::stof(results_j["prob"].get<std::string>());
         float x = std::stof(results_j["x"].get<std::string>());
@@ -95,7 +75,8 @@ int test_byte_track()
     int tracking_fps = tracking_j["fps"].get<int>();
     int tracking_track_buffer = tracking_j["track_buffer"].get<int>();
     std::map<size_t, std::map<size_t, byte_track::Rect<float>>> tracking_results;
-    for(const auto &results_j : tracking_j["results"]){
+    for (const auto &results_j : tracking_j["results"])
+    {
         int frame_id = std::stoi(results_j["frame_id"].get<std::string>());
         int track_id = std::stoi(results_j["track_id"].get<std::string>());
         float x = std::stof(results_j["x"].get<std::string>());
